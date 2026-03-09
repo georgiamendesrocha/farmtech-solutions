@@ -98,9 +98,6 @@ farmtech-solutions/
 │       └── weather_api.R         # API meteorológica (bônus)
 ├── data/
 │   └── crop_data.csv            # Dados exportados (gerado automaticamente)
-├── docs/
-│   ├── article_summary.docx     # Resumo do artigo (a fazer)
-│   └── video_link.txt           # Link do vídeo no YouTube
 ├── README.md                    # Este arquivo
 ├── LICENSE                      # Licença do projeto
 └── .gitignore                   # Arquivos ignorados pelo Git
