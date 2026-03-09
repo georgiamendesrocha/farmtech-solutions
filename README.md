@@ -19,7 +19,6 @@ Sistema completo para gestão de culturas agrícolas, desenvolvido em Python e R
   - [Instalação no Linux](#instalação-no-linux)
 - [Como Usar o Sistema](#-como-usar-o-sistema)
 - [Requisitos do Projeto](#-requisitos-do-projeto)
-- [Entregas](#-entregas)
 - [Equipe](#-equipe)
 
 ---
