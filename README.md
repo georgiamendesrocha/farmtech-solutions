@@ -366,7 +366,7 @@ install.packages("httr", repos = "https://cloud.r-project.org/")
 
 ## 👥 Equipe
 
-- **Integrante 1:** Larissa Sthefanny G. Trigueiro - RM[rm570065]
+- **Integrante 1:** ~~Larissa Sthefanny G. Trigueiro - RM[rm570065]~~
 - **Integrante 2:** Georgia - RM[]
 - **Integrante 3:** Carlos Amaral - RM[]
 - **Integrante 4:** Daniel A. - RM[]
