@@ -1,6 +1,3 @@
-crop_type,area_m2,rows,input_product,input_amount_ml_per_m
-Coffee,7853.98,50,Phosphate,500.00
-Soybean,10000.00,80,Herbicide,300.00
-Coffee,12566.37,65,Fungicide,400.00
-Soybean,15000.00,100,Fertilizer,350.00
-Coffee,5026.55,40,Insecticide,450.00
+crop_type,area_shape,area_m2,rows,row_length_m,input_product,input_amount_ml_per_m,total_input_liters
+Coffee,Circular,7853981633.97,200,75.00,fosfato,100.00,1500.00
+Soybean,Rectangular,5000000000.00,55,90.00,fosfato,0.50,2.48

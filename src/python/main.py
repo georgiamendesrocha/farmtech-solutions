@@ -1,113 +1,134 @@
 """
-FarmTech Solutions - Digital Agriculture Management System
-Main application for managing crop cultivation data
+FarmTech Solutions - Sistema de Agricultura Digital
+Aplicação principal em Python para cadastro de culturas, cálculo de área
+plantada e manejo de insumos.
 
-Supports: Coffee and Soybean crops
-Features: Area calculation, input management, data operations
+Culturas suportadas:
+- Café (área circular)
+- Soja (área retangular)
 """
 
+from __future__ import annotations
+
+import csv
 import math
 import os
-import sys
+from pathlib import Path
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DATA_DIR = PROJECT_ROOT / "data"
+CSV_FILE = DATA_DIR / "crop_data.csv"
 
 
 class CropData:
-    """Class to store crop cultivation data"""
-    
-    def __init__(self):
-        self.crop_types = []        # Type of crop (Coffee or Soybean)
-        self.areas = []             # Planting area in square meters
-        self.rows = []              # Number of rows in the field
-        self.input_products = []    # Input product used (fertilizer, pesticide, etc.)
-        self.input_amounts = []     # Amount of input per meter (mL/m)
-    
-    def add_data(self, crop_type, area, rows, product, amount):
-        """Add new crop data to vectors"""
+    """Armazena os dados da aplicação em vetores/listas paralelas."""
+
+    def __init__(self) -> None:
+        self.crop_types = []
+        self.area_shapes = []
+        self.areas = []
+        self.rows = []
+        self.row_lengths = []
+        self.input_products = []
+        self.input_amounts = []
+        self.total_input_liters = []
+
+    def add_data(
+        self,
+        crop_type: str,
+        area_shape: str,
+        area: float,
+        rows: int,
+        row_length: float,
+        product: str,
+        amount_per_meter: float,
+        total_liters: float,
+    ) -> None:
         self.crop_types.append(crop_type)
+        self.area_shapes.append(area_shape)
         self.areas.append(area)
         self.rows.append(rows)
+        self.row_lengths.append(row_length)
         self.input_products.append(product)
-        self.input_amounts.append(amount)
-    
-    def update_data(self, index, crop_type, area, rows, product, amount):
-        """Update existing data at specific index"""
+        self.input_amounts.append(amount_per_meter)
+        self.total_input_liters.append(total_liters)
+
+    def update_data(
+        self,
+        index: int,
+        crop_type: str,
+        area_shape: str,
+        area: float,
+        rows: int,
+        row_length: float,
+        product: str,
+        amount_per_meter: float,
+        total_liters: float,
+    ) -> bool:
         if 0 <= index < len(self.crop_types):
             self.crop_types[index] = crop_type
+            self.area_shapes[index] = area_shape
             self.areas[index] = area
             self.rows[index] = rows
+            self.row_lengths[index] = row_length
             self.input_products[index] = product
-            self.input_amounts[index] = amount
+            self.input_amounts[index] = amount_per_meter
+            self.total_input_liters[index] = total_liters
             return True
         return False
-    
-    def delete_data(self, index):
-        """Delete data at specific index"""
+
+    def delete_data(self, index: int) -> bool:
         if 0 <= index < len(self.crop_types):
             self.crop_types.pop(index)
+            self.area_shapes.pop(index)
             self.areas.pop(index)
             self.rows.pop(index)
+            self.row_lengths.pop(index)
             self.input_products.pop(index)
             self.input_amounts.pop(index)
+            self.total_input_liters.pop(index)
             return True
         return False
-    
-    def get_count(self):
-        """Return number of records"""
+
+    def get_count(self) -> int:
         return len(self.crop_types)
-    
-    def is_empty(self):
-        """Check if data is empty"""
-        return len(self.crop_types) == 0
+
+    def is_empty(self) -> bool:
+        return self.get_count() == 0
 
 
-def clear_screen():
-    """Clear terminal screen"""
-    os.system('clear' if os.name == 'posix' else 'cls')
+def clear_screen() -> None:
+    os.system("cls" if os.name == "nt" else "clear")
 
 
-def pause():
-    """Pause execution and wait for user input"""
+def pause() -> None:
     input("\nPressione ENTER para continuar...")
 
 
-def calculate_rectangular_area(length, width):
-    """Calculate rectangular area (for Soybean fields)"""
+def calculate_rectangular_area(length: float, width: float) -> float:
     return length * width
 
 
-def calculate_circular_area(radius):
-    """Calculate circular area (for Coffee plantations)"""
+def calculate_circular_area(radius: float) -> float:
     return math.pi * (radius ** 2)
 
 
-def calculate_input_needed(rows, row_length, amount_per_meter):
-    """
-    Calculate total input needed for crop management
-    
-    Parameters:
-    - rows: number of rows in the field
-    - row_length: length of each row in meters
-    - amount_per_meter: amount of input per meter (in mL)
-    
-    Returns: total amount in liters
-    """
+def calculate_input_needed(rows: int, row_length: float, amount_per_meter: float) -> float:
     total_meters = rows * row_length
     total_ml = total_meters * amount_per_meter
-    total_liters = total_ml / 1000  # Convert mL to L
-    return total_liters
+    return total_ml / 1000.0
 
 
-def display_header(title):
-    """Display formatted header"""
+def display_header(title: str) -> None:
     clear_screen()
-    print("=" * 60)
+    print("=" * 70)
     print(f"  {title}")
-    print("=" * 60)
+    print("=" * 70)
     print()
 
 
-def display_main_menu():
-    """Display main menu options"""
+def display_main_menu() -> None:
     display_header("FarmTech Solutions - Menu Principal")
     print("1. Entrada de Dados (Adicionar nova cultura)")
     print("2. Saída de Dados (Visualizar todas as culturas)")
@@ -117,333 +138,272 @@ def display_main_menu():
     print()
 
 
-def input_data(crop_data):
-    """Handle data input for new crop"""
-    display_header("Entrada de Dados - Nova Cultura")
-    
-    # Select crop type
+def ask_int(prompt: str, min_value: int = 1) -> int:
+    while True:
+        try:
+            value = int(input(prompt))
+            if value >= min_value:
+                return value
+            print(f"Valor inválido! Digite um número inteiro maior ou igual a {min_value}.")
+        except ValueError:
+            print("Entrada inválida! Digite um número inteiro.")
+
+
+def ask_float(prompt: str, min_value: float = 0.0) -> float:
+    while True:
+        try:
+            value = float(input(prompt))
+            if value > min_value:
+                return value
+            print(f"Valor inválido! Digite um número maior que {min_value}.")
+        except ValueError:
+            print("Entrada inválida! Digite um número.")
+
+
+def choose_crop_type() -> tuple[str, str, float]:
     print("Escolha o tipo de cultura:")
     print("1. Café (Coffee)")
     print("2. Soja (Soybean)")
     print()
-    
+
     while True:
-        try:
-            crop_choice = int(input("Digite sua escolha (1 ou 2): "))
-            if crop_choice in [1, 2]:
-                break
-            print("Opção inválida! Digite 1 ou 2.")
-        except ValueError:
-            print("Entrada inválida! Digite um número.")
-    
-    if crop_choice == 1:
+        choice = input("Digite sua escolha (1 ou 2): ").strip()
+        if choice in {"1", "2"}:
+            break
+        print("Opção inválida! Digite 1 ou 2.")
+
+    if choice == "1":
         crop_type = "Coffee"
-        print("\n--- Cálculo de Área (Circular) ---")
-        while True:
-            try:
-                radius = float(input("Digite o raio da área de plantio (em metros): "))
-                if radius > 0:
-                    break
-                print("O raio deve ser maior que zero!")
-            except ValueError:
-                print("Entrada inválida! Digite um número.")
-        
+        area_shape = "Circular"
+        print("\n--- Cálculo de Área do Café (Figura Circular) ---")
+        radius = ask_float("Digite o raio da área de plantio (em metros): ")
         area = calculate_circular_area(radius)
-        print(f"\nÁrea calculada: {area:.2f} m²")
-        
-    else:  # Soybean
+    else:
         crop_type = "Soybean"
-        print("\n--- Cálculo de Área (Retangular) ---")
-        while True:
-            try:
-                length = float(input("Digite o comprimento da área (em metros): "))
-                width = float(input("Digite a largura da área (em metros): "))
-                if length > 0 and width > 0:
-                    break
-                print("Comprimento e largura devem ser maiores que zero!")
-            except ValueError:
-                print("Entrada inválida! Digite números.")
-        
+        area_shape = "Rectangular"
+        print("\n--- Cálculo de Área da Soja (Figura Retangular) ---")
+        length = ask_float("Digite o comprimento da área (em metros): ")
+        width = ask_float("Digite a largura da área (em metros): ")
         area = calculate_rectangular_area(length, width)
-        print(f"\nÁrea calculada: {area:.2f} m²")
-    
-    # Input management data
+
+    print(f"\nÁrea calculada: {area:.2f} m²")
+    return crop_type, area_shape, area
+
+
+def collect_management_data() -> tuple[str, int, float, float, float]:
     print("\n--- Manejo de Insumos ---")
-    product = input("Digite o nome do produto/insumo (ex: Fosfato, Herbicida): ")
-    
-    while True:
-        try:
-            rows = int(input("Digite o número de ruas/fileiras na lavoura: "))
-            if rows > 0:
-                break
-            print("O número de ruas deve ser maior que zero!")
-        except ValueError:
-            print("Entrada inválida! Digite um número inteiro.")
-    
-    while True:
-        try:
-            row_length = float(input("Digite o comprimento de cada rua (em metros): "))
-            if row_length > 0:
-                break
-            print("O comprimento deve ser maior que zero!")
-        except ValueError:
-            print("Entrada inválida! Digite um número.")
-    
-    while True:
-        try:
-            amount_per_meter = float(input("Digite a quantidade de insumo por metro (em mL/m): "))
-            if amount_per_meter > 0:
-                break
-            print("A quantidade deve ser maior que zero!")
-        except ValueError:
-            print("Entrada inválida! Digite um número.")
-    
-    # Calculate total input needed
+    product = input("Digite o nome do produto/insumo (ex: Fosfato, Herbicida): ").strip()
+    while not product:
+        print("O nome do produto não pode ficar vazio.")
+        product = input("Digite o nome do produto/insumo: ").strip()
+
+    rows = ask_int("Digite o número de ruas/fileiras na lavoura: ")
+    row_length = ask_float("Digite o comprimento de cada rua (em metros): ")
+    amount_per_meter = ask_float("Digite a quantidade de insumo por metro (em mL/m): ")
+
     total_liters = calculate_input_needed(rows, row_length, amount_per_meter)
-    
-    print(f"\n--- Resultado do Cálculo ---")
+
+    print("\n--- Resultado do Cálculo de Manejo ---")
     print(f"Total de metros lineares: {rows * row_length:.2f} m")
     print(f"Total de insumo necessário: {total_liters:.2f} litros")
-    
-    # Save data
-    crop_data.add_data(crop_type, area, rows, product, amount_per_meter)
-    
+
+    return product, rows, row_length, amount_per_meter, total_liters
+
+
+def input_data(crop_data: CropData) -> None:
+    display_header("Entrada de Dados - Nova Cultura")
+    crop_type, area_shape, area = choose_crop_type()
+    product, rows, row_length, amount_per_meter, total_liters = collect_management_data()
+
+    crop_data.add_data(
+        crop_type=crop_type,
+        area_shape=area_shape,
+        area=area,
+        rows=rows,
+        row_length=row_length,
+        product=product,
+        amount_per_meter=amount_per_meter,
+        total_liters=total_liters,
+    )
+
     print("\n✓ Dados salvos com sucesso!")
     pause()
 
 
-def output_data(crop_data):
-    """Display all stored crop data"""
+def output_data(crop_data: CropData) -> None:
     display_header("Saída de Dados - Todas as Culturas")
-    
+
     if crop_data.is_empty():
         print("Nenhum dado cadastrado ainda.")
         pause()
         return
-    
+
     for i in range(crop_data.get_count()):
-        print(f"\n{'─' * 60}")
+        print("─" * 70)
         print(f"Registro #{i + 1}")
-        print(f"{'─' * 60}")
-        print(f"Tipo de Cultura: {crop_data.crop_types[i]}")
-        print(f"Área de Plantio: {crop_data.areas[i]:.2f} m²")
-        print(f"Número de Ruas: {crop_data.rows[i]}")
-        print(f"Produto/Insumo: {crop_data.input_products[i]}")
-        print(f"Quantidade por Metro: {crop_data.input_amounts[i]:.2f} mL/m")
-        
-        # Estimate total input needed (assuming 100m rows as example)
-        example_row_length = 100
-        total_liters = calculate_input_needed(
-            crop_data.rows[i], 
-            example_row_length, 
-            crop_data.input_amounts[i]
-        )
-        print(f"Insumo Estimado (ruas de {example_row_length}m): {total_liters:.2f} litros")
-    
-    print(f"\n{'─' * 60}")
+        print("─" * 70)
+        print(f"Tipo de Cultura:           {crop_data.crop_types[i]}")
+        print(f"Figura Geométrica:         {crop_data.area_shapes[i]}")
+        print(f"Área de Plantio:           {crop_data.areas[i]:.2f} m²")
+        print(f"Número de Ruas:            {crop_data.rows[i]}")
+        print(f"Comprimento de Cada Rua:   {crop_data.row_lengths[i]:.2f} m")
+        print(f"Produto/Insumo:            {crop_data.input_products[i]}")
+        print(f"Quantidade por Metro:      {crop_data.input_amounts[i]:.2f} mL/m")
+        print(f"Total de Insumo:           {crop_data.total_input_liters[i]:.2f} litros")
+        print()
+
+    print("─" * 70)
     print(f"Total de registros: {crop_data.get_count()}")
     pause()
 
 
-def update_data(crop_data):
-    """Update existing crop data"""
+def choose_record_index(crop_data: CropData, action_label: str) -> int:
+    print("Registros disponíveis:\n")
+    for i in range(crop_data.get_count()):
+        print(
+            f"{i + 1}. {crop_data.crop_types[i]} | "
+            f"Área: {crop_data.areas[i]:.2f} m² | "
+            f"Produto: {crop_data.input_products[i]}"
+        )
+    print()
+
+    while True:
+        try:
+            choice = int(input(f"Digite o número do registro para {action_label} (1-{crop_data.get_count()}): "))
+            if 1 <= choice <= crop_data.get_count():
+                return choice - 1
+            print(f"Opção inválida! Digite um número entre 1 e {crop_data.get_count()}.")
+        except ValueError:
+            print("Entrada inválida! Digite um número inteiro.")
+
+
+def update_data(crop_data: CropData) -> None:
     display_header("Atualizar Dados - Modificar Registro")
-    
+
     if crop_data.is_empty():
         print("Nenhum dado cadastrado para atualizar.")
         pause()
         return
-    
-    # Show current data
-    print("Registros disponíveis:\n")
-    for i in range(crop_data.get_count()):
-        print(f"{i + 1}. {crop_data.crop_types[i]} - Área: {crop_data.areas[i]:.2f} m²")
-    
-    print()
-    while True:
-        try:
-            choice = int(input(f"Digite o número do registro para atualizar (1-{crop_data.get_count()}): "))
-            if 1 <= choice <= crop_data.get_count():
-                break
-            print(f"Opção inválida! Digite um número entre 1 e {crop_data.get_count()}.")
-        except ValueError:
-            print("Entrada inválida! Digite um número.")
-    
-    index = choice - 1
-    
-    print(f"\nAtualizando registro #{choice}...")
-    print("Digite os novos dados:\n")
-    
-    # Similar input process as input_data
-    print("Escolha o tipo de cultura:")
-    print("1. Café (Coffee)")
-    print("2. Soja (Soybean)")
-    
-    while True:
-        try:
-            crop_choice = int(input("Digite sua escolha (1 ou 2): "))
-            if crop_choice in [1, 2]:
-                break
-            print("Opção inválida! Digite 1 ou 2.")
-        except ValueError:
-            print("Entrada inválida! Digite um número.")
-    
-    if crop_choice == 1:
-        crop_type = "Coffee"
-        while True:
-            try:
-                radius = float(input("Digite o raio da área (em metros): "))
-                if radius > 0:
-                    break
-                print("O raio deve ser maior que zero!")
-            except ValueError:
-                print("Entrada inválida! Digite um número.")
-        area = calculate_circular_area(radius)
-    else:
-        crop_type = "Soybean"
-        while True:
-            try:
-                length = float(input("Digite o comprimento da área (em metros): "))
-                width = float(input("Digite a largura da área (em metros): "))
-                if length > 0 and width > 0:
-                    break
-                print("Comprimento e largura devem ser maiores que zero!")
-            except ValueError:
-                print("Entrada inválida! Digite números.")
-        area = calculate_rectangular_area(length, width)
-    
-    product = input("Digite o nome do produto/insumo: ")
-    
-    while True:
-        try:
-            rows = int(input("Digite o número de ruas: "))
-            if rows > 0:
-                break
-            print("O número de ruas deve ser maior que zero!")
-        except ValueError:
-            print("Entrada inválida! Digite um número inteiro.")
-    
-    while True:
-        try:
-            amount = float(input("Digite a quantidade por metro (mL/m): "))
-            if amount > 0:
-                break
-            print("A quantidade deve ser maior que zero!")
-        except ValueError:
-            print("Entrada inválida! Digite um número.")
-    
-    # Update data
-    crop_data.update_data(index, crop_type, area, rows, product, amount)
-    
+
+    index = choose_record_index(crop_data, "atualizar")
+    print(f"\nAtualizando registro #{index + 1}...\n")
+
+    crop_type, area_shape, area = choose_crop_type()
+    product, rows, row_length, amount_per_meter, total_liters = collect_management_data()
+
+    crop_data.update_data(
+        index=index,
+        crop_type=crop_type,
+        area_shape=area_shape,
+        area=area,
+        rows=rows,
+        row_length=row_length,
+        product=product,
+        amount_per_meter=amount_per_meter,
+        total_liters=total_liters,
+    )
+
     print("\n✓ Dados atualizados com sucesso!")
     pause()
 
 
-def delete_data(crop_data):
-    """Delete crop data"""
+def delete_data(crop_data: CropData) -> None:
     display_header("Deletar Dados - Remover Registro")
-    
+
     if crop_data.is_empty():
         print("Nenhum dado cadastrado para deletar.")
         pause()
         return
-    
-    # Show current data
-    print("Registros disponíveis:\n")
-    for i in range(crop_data.get_count()):
-        print(f"{i + 1}. {crop_data.crop_types[i]} - Área: {crop_data.areas[i]:.2f} m²")
-    
-    print()
-    while True:
-        try:
-            choice = int(input(f"Digite o número do registro para deletar (1-{crop_data.get_count()}): "))
-            if 1 <= choice <= crop_data.get_count():
-                break
-            print(f"Opção inválida! Digite um número entre 1 e {crop_data.get_count()}.")
-        except ValueError:
-            print("Entrada inválida! Digite um número.")
-    
-    index = choice - 1
-    
-    # Confirm deletion
-    print(f"\nVocê tem certeza que deseja deletar o registro #{choice}?")
+
+    index = choose_record_index(crop_data, "deletar")
+
+    print("\nVocê tem certeza que deseja deletar este registro?")
     print(f"Cultura: {crop_data.crop_types[index]}")
-    confirm = input("Digite 'SIM' para confirmar: ")
-    
-    if confirm.upper() == 'SIM':
+    print(f"Produto: {crop_data.input_products[index]}")
+    confirm = input("Digite 'SIM' para confirmar: ").strip().upper()
+
+    if confirm == "SIM":
         crop_data.delete_data(index)
         print("\n✓ Registro deletado com sucesso!")
     else:
         print("\nOperação cancelada.")
-    
+
     pause()
 
 
-def export_data_to_csv(crop_data):
-    """Export data to CSV file for R analysis"""
+def export_data_to_csv(crop_data: CropData) -> None:
     if crop_data.is_empty():
+        print("\nNenhum dado para exportar.")
         return
-    
-    data_dir = "../../data"
-    os.makedirs(data_dir, exist_ok=True)
-    
-    csv_path = os.path.join(data_dir, "crop_data.csv")
-    
+
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
     try:
-        with open(csv_path, 'w') as f:
-            # Write header
-            f.write("crop_type,area_m2,rows,input_product,input_amount_ml_per_m\n")
-            
-            # Write data
+        with CSV_FILE.open("w", newline="", encoding="utf-8") as file:
+            writer = csv.writer(file)
+            writer.writerow(
+                [
+                    "crop_type",
+                    "area_shape",
+                    "area_m2",
+                    "rows",
+                    "row_length_m",
+                    "input_product",
+                    "input_amount_ml_per_m",
+                    "total_input_liters",
+                ]
+            )
+
             for i in range(crop_data.get_count()):
-                f.write(f"{crop_data.crop_types[i]},")
-                f.write(f"{crop_data.areas[i]:.2f},")
-                f.write(f"{crop_data.rows[i]},")
-                f.write(f"{crop_data.input_products[i]},")
-                f.write(f"{crop_data.input_amounts[i]:.2f}\n")
-        
-        print(f"\n✓ Dados exportados para: {csv_path}")
-    except Exception as e:
-        print(f"\n✗ Erro ao exportar dados: {e}")
+                writer.writerow(
+                    [
+                        crop_data.crop_types[i],
+                        crop_data.area_shapes[i],
+                        f"{crop_data.areas[i]:.2f}",
+                        crop_data.rows[i],
+                        f"{crop_data.row_lengths[i]:.2f}",
+                        crop_data.input_products[i],
+                        f"{crop_data.input_amounts[i]:.2f}",
+                        f"{crop_data.total_input_liters[i]:.2f}",
+                    ]
+                )
+
+        print(f"\n✓ Dados exportados com sucesso para: {CSV_FILE}")
+    except OSError as exc:
+        print(f"\n✗ Erro ao exportar dados: {exc}")
 
 
-def main():
-    """Main program loop"""
+def main() -> None:
     crop_data = CropData()
-    
+
     while True:
         display_main_menu()
-        
+        choice = input("Digite sua escolha (1-5): ").strip()
+
         try:
-            choice = input("Digite sua escolha (1-5): ")
-            
-            if choice == '1':
+            if choice == "1":
                 input_data(crop_data)
-            elif choice == '2':
+            elif choice == "2":
                 output_data(crop_data)
-            elif choice == '3':
+            elif choice == "3":
                 update_data(crop_data)
-            elif choice == '4':
+            elif choice == "4":
                 delete_data(crop_data)
-            elif choice == '5':
+            elif choice == "5":
                 display_header("Encerrando Programa")
-                
-                # Export data before exiting
                 if not crop_data.is_empty():
                     export_data_to_csv(crop_data)
-                
                 print("Obrigado por usar o FarmTech Solutions!")
                 print("Até logo! 🌱")
-                sys.exit(0)
+                break
             else:
-                print("\nOpção inválida! Por favor, escolha uma opção de 1 a 5.")
+                print("\nOpção inválida! Escolha uma opção de 1 a 5.")
                 pause()
-                
         except KeyboardInterrupt:
             print("\n\nPrograma interrompido pelo usuário.")
-            sys.exit(0)
-        except Exception as e:
-            print(f"\nErro inesperado: {e}")
+            break
+        except Exception as exc:
+            print(f"\nErro inesperado: {exc}")
             pause()
 
 

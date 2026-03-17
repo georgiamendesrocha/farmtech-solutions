@@ -92,15 +92,17 @@ Este projeto foi desenvolvido para a **FarmTech Solutions**, uma startup fictíc
 farmtech-solutions/
 ├── src/
 │   ├── python/
-│   │   └── main.py              # Aplicação principal em Python
+│   │   └── main.py                 # Aplicação principal em Python
 │   └── r/
-│       ├── statistics_analysis.R # Análise estatística
-│       └── weather_api.R         # API meteorológica (bônus)
+│       ├── analysis/
+│       │   └── statistics_analysis.R   # Análise estatística
+│       └── services/
+│           └── weather_api.R           # API meteorológica (bônus)
 ├── data/
-│   └── crop_data.csv            # Dados exportados (gerado automaticamente)
-├── README.md                    # Este arquivo
-├── LICENSE                      # Licença do projeto
-└── .gitignore                   # Arquivos ignorados pelo Git
+│   └── crop_data.csv               # Dados exportados (gerado automaticamente)
+├── README.md                       # Documentação do projeto
+├── LICENSE                         # Licença do projeto
+└── .gitignore                      # Arquivos ignorados pelo Git
 ```
 
 ---
@@ -381,7 +383,54 @@ install.packages("httr", repos = "https://cloud.r-project.org/")
 - R Documentation: https://www.r-project.org
 
 ---
+# FarmTech Solutions - Agricultura Digital
 
+Projeto acadêmico desenvolvido para a FIAP com foco em agricultura digital, usando Python e R.
+
+## Objetivo do projeto
+
+A aplicação permite:
+- cadastrar duas culturas agrícolas: **Café** e **Soja**;
+- calcular a área de plantio conforme a figura geométrica escolhida para cada cultura;
+- calcular o manejo de insumos com base em número de ruas, comprimento das ruas e quantidade aplicada por metro;
+- armazenar os dados em vetores/listas;
+- atualizar, visualizar e deletar registros;
+- exportar os dados para CSV;
+- analisar estatísticas básicas em R;
+- consultar dados meteorológicos via API pública usando R.
+
+## Tecnologias utilizadas
+
+- Python 3
+- R
+- Open-Meteo API
+- Git/GitHub
+
+## Estrutura do projeto
+
+```text
+farmtech-solutions/
+├── src/
+│   ├── python/
+│   │   ├── main.py
+│   │   └── test_functions.py
+│   └── r/
+│       ├── analysis/
+│       │   └── statistics_analysis.R   
+│       └── services/
+│           └── weather_api.R          
+├── data/
+│   ├── crop_data.csv
+│   └── crop_data_example.csv
+├── docs/
+│   ├── article_summary.md
+│   └── video_link.txt
+├── README.md
+├── QUICK_START.md
+├── GIT_GUIDE.md
+├── CHECKLIST.md
+├── LICENSE
+└── test_setup.sh
 ## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
