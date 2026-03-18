@@ -7,10 +7,10 @@ echo ""
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-NC='\033[0m' 
+NC='\033[0m'
 
 check_command() {
-    if command -v $1 &> /dev/null; then
+    if command -v "$1" &> /dev/null; then
         VERSION=$($1 --version 2>&1 | head -n 1)
         echo -e "${GREEN}✓${NC} $2 está instalado: $VERSION"
         return 0
@@ -32,12 +32,10 @@ else
 fi
 
 echo ""
-
 echo "Verificando R..."
 check_command Rscript "R" "https://cran.r-project.org/"
 
 echo ""
-
 echo "Verificando Git..."
 check_command git "Git" "https://git-scm.com/downloads"
 
@@ -47,9 +45,9 @@ echo "  Verificação de Estrutura de Arquivos"
 echo "============================================================================"
 echo ""
 
-# Check file structure
 FILES=(
     "src/python/main.py"
+    "src/python/test_functions.py"
     "src/r/statistics_analysis.R"
     "src/r/weather_api.R"
     "README.md"
@@ -57,6 +55,7 @@ FILES=(
     "GIT_GUIDE.md"
     "CHECKLIST.md"
     ".gitignore"
+    "LICENSE"
     "docs/article_summary.md"
     "docs/video_link.txt"
 )
@@ -74,13 +73,13 @@ echo "==========================================================================
 echo "  Próximos Passos"
 echo "============================================================================"
 echo ""
-echo "1. Se algo não está instalado, siga as instruções acima"
+echo "1. Se algo não estiver instalado, siga os links acima"
 echo "2. Leia o QUICK_START.md para começar rapidamente"
-echo "3. Leia o README.md para instruções completas"
-echo "4. Leia o GIT_GUIDE.md para usar Git e GitHub"
+echo "3. Leia o README.md para a visão geral do projeto"
+echo "4. Leia o GIT_GUIDE.md para orientar o versionamento"
 echo ""
 echo "Para executar o projeto:"
-echo "  cd src/python && python3 main.py"
+echo "  cd src/python && python main.py"
 echo ""
 echo "============================================================================"
 echo ""
