@@ -1,7 +1,6 @@
 cat("\014")
 
-project_root <- normalizePath(file.path(getwd(), "..", ".."), winslash = "/", mustWork = FALSE)
-data_file <- file.path(project_root, "data", "crop_data.csv")
+data_file <- "C:/Users/Georgia/Desktop/farmtech-solutions/data/crop_data.csv"
 
 print_header <- function(title) {
   cat("\n")
@@ -42,10 +41,9 @@ main <- function() {
     cat("ERRO: Arquivo de dados não encontrado!\n")
     cat("Caminho esperado:", data_file, "\n\n")
     cat("Instruções:\n")
-    cat("1. Execute primeiro a aplicação Python (src/python/main.py)\n")
-    cat("2. Cadastre alguns registros de culturas\n")
-    cat("3. Escolha a opção 'Sair' para exportar os dados\n")
-    cat("4. Execute este script novamente\n\n")
+    cat("1. Verifique se o arquivo crop_data.csv está na pasta correta\n")
+    cat("2. Confirme se o nome do arquivo está exatamente como 'crop_data.csv'\n")
+    cat("3. Execute este script novamente\n\n")
     return()
   }
 
@@ -53,7 +51,7 @@ main <- function() {
   crop_data <- read.csv(data_file, header = TRUE, stringsAsFactors = FALSE)
 
   if (nrow(crop_data) == 0) {
-    cat("\nO arquivo está vazio. Adicione dados usando a aplicação Python.\n\n")
+    cat("\nO arquivo está vazio. Adicione dados e tente novamente.\n\n")
     return()
   }
 
@@ -108,8 +106,8 @@ main <- function() {
   print_header("Insights Adicionais")
   total_area <- sum(crop_data$area_m2, na.rm = TRUE)
   total_input <- sum(crop_data$total_input_liters, na.rm = TRUE)
-  cat(sprintf("  Área total cultivada:        %.2f m² (%.2f hectares)\n", total_area, total_area / 10000))
-  cat(sprintf("  Total de insumos estimado:   %.2f L\n", total_input))
+  cat(sprintf("  Área total cultivada:         %.2f m² (%.2f hectares)\n", total_area, total_area / 10000))
+  cat(sprintf("  Total de insumos estimado:    %.2f L\n", total_input))
 
   avg_area_by_crop <- aggregate(area_m2 ~ crop_type, data = crop_data, FUN = mean)
   largest_crop <- avg_area_by_crop[which.max(avg_area_by_crop$area_m2), ]
