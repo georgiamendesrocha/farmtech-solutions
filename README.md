@@ -108,7 +108,7 @@ Soybean,Rectangular,10000.00,80,120.00,Herbicide,300.00,2880.00
 
 - Daniel Abreu dos Santos
 - Carlos Magnus Costa Amaral
-- Georgia Mendes Rocha
+- Georgia Mendes Rocha RM573281
 - Larissa Sthefanny Guedes Trigueiro
 
 ## Licença
