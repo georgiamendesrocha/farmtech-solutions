@@ -106,7 +106,7 @@ Soybean,Rectangular,10000.00,80,120.00,Herbicide,300.00,2880.00
 
 ## Integrantes
 
-- Daniel Abreu dos Santos
+- Daniel Abreu dos Santos RM570844
 - Carlos Magnus Costa Amaral RM573978
 - Georgia Mendes Rocha RM573281
 - Larissa Sthefanny Guedes Trigueiro
